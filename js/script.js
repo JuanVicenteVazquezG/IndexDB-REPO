@@ -3,7 +3,7 @@
 let DB;
 
 // Interface Selectors
-const form = document.querySelector('#form'),
+const form = document.querySelector('form'),
     petName = document.querySelector('#pet'),
     customerName = document.querySelector('#customer'),
     phone = document.querySelector('#tel'),
@@ -48,13 +48,34 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create the index and field of data base, createIndex: 3 parameters, name, keypath and options
         objectStore.createIndex('petName', 'petName', { unique: false });
         objectStore.createIndex('customerName', 'customerName', { unique: false });
-        objectStore.createIndex('phone', 'phone', { unique: true});
+        objectStore.createIndex('phone', 'phone', { unique: true });
         objectStore.createIndex('date', 'date', { unique: false });
         objectStore.createIndex('hour', 'hour', { unique: false });
         objectStore.createIndex('symptoms', 'symptoms', { unique: false });
 
         console.log('Database Created and Ready');
     };
+
+    //When the form is sent
+    form.addEventListener('submit', addData);
+
+    // functions
+    function addData(e) {
+        e.preventDefault();
+        const newAppointment = {
+            petName: petName.value,
+            customerName: customerName.value,
+            phone: phone.value,
+            date: date.value,
+            hour: hour.value,
+            symptoms: symptoms.value,
+        }
+        // In IndexedDB we use transactions
+        let transaction = DB.transaction(['appointments'], 'readwrite');
+        let objectStore = transaction.objectStore('appointments');
+        // console.log('objectStore', objectStore);
+        let petition = objectStore.add(newAppointment);
+    }
 
 });
 
