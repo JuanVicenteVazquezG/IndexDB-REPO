@@ -74,7 +74,50 @@ document.addEventListener('DOMContentLoaded', () => {
         let transaction = DB.transaction(['appointments'], 'readwrite');
         let objectStore = transaction.objectStore('appointments');
         // console.log('objectStore', objectStore);
-        let petition = objectStore.add(newAppointment);
+        let dataRequest = objectStore.add(newAppointment);
+        dataRequest.onsuccess = () => {
+            form.reset();
+        };
+        transaction.onComplete = () => {
+            console.log('Appointment Added!!!');
+        };
+        transaction.onerror = () => {
+            console.log('There was an error adding Apppointment Data. Data was not added!');
+        }
+
+        
+
+    }
+
+    function showData() {
+        // Clean previous appointments 
+        while (appointment.firstChild) {
+            appointment.removeChild(appointment.firstChild);
+        }
+
+        // Create objectStore
+        let objectStore = DB.transaction('appointments').objectStore('appointments');
+
+        // Return a request
+        objectStore.openCursos().onsuccess = function (e) {
+            // The cursor will be positioned on the indicated record to access the data
+            let cursor = e.target.result;
+            if (cursor) {
+                let appointmentHTML = document.createElement('li');
+                appointmentHTML.setAttribute('data-appointment-id', cursor.value.key);
+                appointmentHTML.classList.add('list-group-item');
+                appointmentHTML.innerHTML = `
+                <p class="font-weight-bold">Pet: <span class="font-weight-normal">${cursor.value.petName}</span> </p>`;
+
+                // append to the parent
+
+                appointment.appendChild(appointmentHTML);
+
+                cursor.continue();
+
+            }
+        };
+
     }
 
 });
